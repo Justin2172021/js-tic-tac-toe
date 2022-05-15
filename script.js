@@ -39,10 +39,6 @@ let createPlayer = () => {
             // return {playerName, playerNumber, assignedXO};
         }
     }
-
-    // let getPlayerName = () => { playerName;
-    // console.log("This is the name of player " + playerNumber + "....." + playerName); }
-    // return {getPlayerName, playerName, playerNumber, assignedXO};
 };
 
 // Setting up the gameBoard module
@@ -105,6 +101,57 @@ let displayControllerModule = (function() {
             index++;
             })
 
+            // Run local function to check for win/disable gameBoard from further play/display winner on DOM
+            function checkWin(player){
+              
+                const horizontal = [0,3,6].map(i=>{return[i,i+1,i+2]});
+                const vertical = [0,1,2].map(i=>{return[i,i+3,i+6]});
+                const diagonal = [[0,4,8],[2,4,6]];
+              
+                let allwins = [].concat(horizontal).concat(vertical).concat(diagonal);
+                
+                let results = allwins.some(indices => { 
+                return gridBoxes[indices[0]].textContent == player && gridBoxes[indices[1]].textContent == player && gridBoxes[indices[2]].textContent == player})
+                return results;
+            }
+              
+            if (checkWin("X") == true) {
+                console.log(gameBoardModule.playerArray[0], " Wins!");
+                const body = document.querySelector("body");
+                const playerWinMessage = document.createElement("h1");
+                playerWinMessage.textContent = (gameBoardModule.playerArray[0] + " Wins!");
+                body.appendChild(playerWinMessage);
+                makeMove.forEach(makeMoves => {
+                    makeMoves.remove();
+                });
+                startGameButton.remove();
+                return;
+              
+            } else if (checkWin("O") == true) {
+                console.log(gameBoardModule.playerArray[3], " Wins!");
+                const body = document.querySelector("body");
+                const playerWinMessage = document.createElement("h1");
+                playerWinMessage.textContent = (gameBoardModule.playerArray[3] + " Wins!");
+                body.appendChild(playerWinMessage);
+                makeMove.forEach(makeMoves => {
+                    makeMoves.remove();
+                });
+                startGameButton.remove();
+                return;
+
+            } else if (gameBoardModule.gameBoard.length == 9) {
+                console.log("Tie!");
+                const body = document.querySelector("body");
+                const playerWinMessage = document.createElement("h1");
+                playerWinMessage.textContent = ("Tie!");
+                body.appendChild(playerWinMessage);
+                makeMove.forEach(makeMoves => {
+                    makeMoves.remove();
+                });
+                startGameButton.remove();
+                return;
+            }
+
         gameBoardModule.makePlayerMove();           
         }
 
@@ -114,8 +161,12 @@ let displayControllerModule = (function() {
     // Listen for click to start the game
     const startGameButton = document.querySelector(".start-game-button");
     startGameButton.addEventListener("click", createPlayer);
-    
-    // // Test private function **remove if not needed later**
-    // let testF = () => {console.log("testing private function call inside of a module object.....")};
-    return {};
+
+    // Listen for click to restart the game
+    const clearBoardButton = document.querySelector(".clear-board-button");
+    clearBoardButton.addEventListener("click", clearBoard);
+
+    function clearBoard() {
+        location.reload();
+    }
 })();
